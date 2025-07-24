@@ -39,6 +39,13 @@ data:
             {{- with (omit $server.config.persistence.default.sql "driver" "driverName" "host" "port" "connectAddr" "connectProtocol" "database" "databaseName" "user" "password" "existingSecret") }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
+          {{- else if eq (include "temporal.persistence.driver" (list $ "default")) "valkey" }}
+          valkey:
+            hosts: {{ include "temporal.persistence.valkey.hosts" (list $ "default") }}
+            password: {{ `{{ .Env.TEMPORAL_STORE_PASSWORD | quote }}` }}
+            {{- with (omit $server.config.persistence.default.valkey "hosts" "password" "existingSecret") }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
           {{- end }}
           {{- with $server.config.persistence.default.faultInjection}}
           faultInjection:
@@ -73,6 +80,13 @@ data:
             user: "{{ include "temporal.persistence.sql.user" (list $ "visibility") }}"
             password: {{ `{{ .Env.TEMPORAL_VISIBILITY_STORE_PASSWORD  | quote }}` }}
             {{- with (omit $server.config.persistence.visibility.sql "driver" "driverName" "host" "port" "connectAddr" "connectProtocol" "database" "databaseName" "user" "password" "existingSecret") }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+        {{- else if eq (include "temporal.persistence.driver" (list $ "visibility")) "valkey" }}
+          valkey:
+            hosts: {{ include "temporal.persistence.valkey.hosts" (list $ "visibility") }}
+            password: {{ `{{ .Env.TEMPORAL_VISIBILITY_STORE_PASSWORD  | quote }}` }}
+            {{- with (omit $server.config.persistence.visibility.valkey "hosts" "password" "existingSecret") }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
         {{- end }}

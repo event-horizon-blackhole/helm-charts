@@ -167,6 +167,18 @@ server:
           maxConnLifetime: "1h"
           # connectAttributes:
           # tx_isolation: 'READ-COMMITTED'
+        valkey:
+          hosts: []
+          password: ""
+          existingSecret: ""
+          database: 0
+          maxRetries: 3
+          poolSize: 10
+          enableTLS: false
+          dialTimeout: "5s"
+          readTimeout: "3s"
+          writeTimeout: "3s"
+          clusterMode: false
       visibility:
         driver: "cassandra"
         cassandra:
@@ -198,6 +210,18 @@ server:
           maxConnLifetime: "1h"
           # connectAttributes:
           #   tx_isolation: 'READ-COMMITTED'
+        valkey:
+          hosts: []
+          password: ""
+          existingSecret: ""
+          database: 1
+          maxRetries: 3
+          poolSize: 10
+          enableTLS: false
+          dialTimeout: "5s"
+          readTimeout: "3s"
+          writeTimeout: "3s"
+          clusterMode: false
     namespaces:
       # Enable this to create namespaces
       create: false

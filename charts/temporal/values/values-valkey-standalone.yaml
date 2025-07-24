@@ -1,0 +1,55 @@
+server:
+  config:
+    logLevel: "debug,info"
+
+    numHistoryShards: 512
+
+    persistence:
+      default:
+        driver: "valkey"
+
+        valkey:
+          hosts: ["valkey.default.svc.cluster.local:6379"]
+          password: ""
+          existingSecret: ""
+          database: 0
+          maxRetries: 3
+          poolSize: 10
+          enableTLS: false
+          dialTimeout: "5s"
+          readTimeout: "3s"
+          writeTimeout: "3s"
+          clusterMode: false
+
+      visibility:
+        driver: "valkey"
+
+        valkey:
+          hosts: ["valkey.default.svc.cluster.local:6379"]
+          password: ""
+          existingSecret: ""
+          database: 1
+          maxRetries: 3
+          poolSize: 10
+          enableTLS: false
+          dialTimeout: "5s"
+          readTimeout: "3s"
+          writeTimeout: "3s"
+          clusterMode: false
+
+cassandra:
+  enabled: false
+
+mysql:
+  enabled: false
+
+postgresql:
+  enabled: false
+
+schema:
+  createDatabase:
+    enabled: false
+  setup:
+    enabled: false
+  update:
+    enabled: false

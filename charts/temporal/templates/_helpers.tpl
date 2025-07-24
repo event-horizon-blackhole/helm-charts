@@ -451,3 +451,42 @@ To modify camelCase to hyphenated internal-frontend service name
         {{- print $service }}
     {{- end }}
 {{- end -}}
+
+{{- define "temporal.persistence.valkey.hosts" -}}
+{{- $global := index . 0 -}}
+{{- $store := index . 1 -}}
+{{- $storeConfig := index $global.Values.server.config.persistence $store -}}
+{{- if $storeConfig.valkey.hosts -}}
+{{- $storeConfig.valkey.hosts | toJson -}}
+{{- else -}}
+{{- required (printf "Please specify valkey hosts for %s store" $store) $storeConfig.valkey.hosts -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "temporal.persistence.valkey.secretName" -}}
+{{- $global := index . 0 -}}
+{{- $store := index . 1 -}}
+{{- $storeConfig := index $global.Values.server.config.persistence $store -}}
+{{- $driverConfig := $storeConfig.valkey -}}
+{{- if $driverConfig.existingSecret -}}
+{{- $driverConfig.existingSecret -}}
+{{- else if $driverConfig.password -}}
+{{- include "temporal.componentname" (list $global (printf "%s-store" $store)) -}}
+{{- else -}}
+{{/* Valkey password is optional, but we will create an empty secret for it */}}
+{{- include "temporal.componentname" (list $global (printf "%s-store" $store)) -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "temporal.persistence.valkey.secretKey" -}}
+{{- $global := index . 0 -}}
+{{- $store := index . 1 -}}
+{{- $storeConfig := index $global.Values.server.config.persistence $store -}}
+{{- $driverConfig := $storeConfig.valkey -}}
+{{- with $driverConfig.secretKey -}}
+{{- print . -}}
+{{- else -}}
+{{/* Valkey password is optional, but we will create an empty secret for it */}}
+{{- print "password" -}}
+{{- end -}}
+{{- end -}}
