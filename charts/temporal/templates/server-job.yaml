@@ -182,6 +182,32 @@ spec:
               {{- end }}
           {{- end }}
         {{- end }}
+        {{- if or (eq (include "temporal.persistence.driver" (list $ "default")) "valkey") (eq (include "temporal.persistence.driver" (list $ "visibility")) "valkey") }}
+        - name: check-valkey
+          image: "{{ $.Values.admintools.image.repository }}:{{ $.Values.admintools.image.tag }}"
+          imagePullPolicy: {{ $.Values.admintools.image.pullPolicy }}
+          command: ['sh', '-c']
+          args:
+            - |
+              if [ "$VALKEY_CLUSTER_MODE" = "true" ]; then
+                for host in $(echo $VALKEY_HOSTS | jq -r '.[]'); do
+                  until valkey-cli -h ${host%:*} -p ${host#*:} ${VALKEY_PASSWORD:+-a "$VALKEY_PASSWORD"} ${VALKEY_ENABLE_TLS:+--tls} ping; do
+                    echo "waiting for valkey cluster node $host to start"; sleep 1;
+                  done;
+                done
+              else
+                host=$(echo $VALKEY_HOSTS | jq -r '.[0]')
+                until valkey-cli -h ${host%:*} -p ${host#*:} ${VALKEY_PASSWORD:+-a "$VALKEY_PASSWORD"} ${VALKEY_ENABLE_TLS:+--tls} ping; do
+                  echo "waiting for valkey to start"; sleep 1;
+                done
+              fi
+          env:
+            {{- include "temporal.admintools-env" (list $ "default") | nindent 12 }}
+          {{- with $.Values.schema.containerSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- end }}
       containers:
         - name: done
           image: "{{ $.Values.admintools.image.repository }}:{{ $.Values.admintools.image.tag }}"

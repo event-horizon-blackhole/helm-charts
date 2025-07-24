@@ -93,5 +93,19 @@
   value: {{ $driverConfig.version }}
 - name: ES_VISIBILITY_INDEX
   value: {{ $driverConfig.visibilityIndex }}
+{{- else if eq $driver "valkey" -}}
+- name: VALKEY_HOSTS
+  value: {{ include "temporal.persistence.valkey.hosts" (list $global $store) }}
+- name: VALKEY_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "temporal.persistence.secretName" (list $global $store) }}
+      key: {{ include "temporal.persistence.secretKey" (list $global $store) }}
+- name: VALKEY_DATABASE
+  value: {{ $driverConfig.database | quote }}
+- name: VALKEY_ENABLE_TLS
+  value: {{ $driverConfig.enableTLS | quote }}
+- name: VALKEY_CLUSTER_MODE
+  value: {{ $driverConfig.clusterMode | quote }}
 {{- end }}
 {{- end -}}
